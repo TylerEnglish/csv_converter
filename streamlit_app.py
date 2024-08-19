@@ -34,13 +34,13 @@ def app():
             st.dataframe(df)
 
             new_df = data_conversion(df,
-                        pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=6,
-                        pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=7,
-                        pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=0,
-                        pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=1,
-                        pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=2,
-                        pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=4,
-                        pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=5)
+                        pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=6),
+                        pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=7),
+                        pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=0),
+                        pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=1),
+                        pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=2),
+                        pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=4),
+                        pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=5))
 
             st.subheader("Converted Data")
             st.dataframe(new_df)
