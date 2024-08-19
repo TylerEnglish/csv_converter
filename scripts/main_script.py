@@ -13,7 +13,9 @@ def float_to_time(h):
         None
 
     return h
-
+    
+def time_to_float(time) -> float:
+    return time.dt.hour
 
 
 def modify_value(val, exclude):
@@ -147,8 +149,8 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
 
     # Set stats pt 2
     try:
-        df[new_c["Columns"][7]] = m_df[m_df.columns[m_df.columns.get_loc(main_c['Columns'][9])]]
-        df[new_c["Columns"][8]] = m_df[m_df.columns[m_df.columns.get_loc(main_c['Columns'][10])]]
+        df[new_c["Columns"][7]] = m_df[m_df.columns[m_df.columns.get_loc(main_c['Columns'][9])]].apply(time_to_float)
+        df[new_c["Columns"][8]] = m_df[m_df.columns[m_df.columns.get_loc(main_c['Columns'][10])]].apply(time_to_float)
     except:
         None
 
