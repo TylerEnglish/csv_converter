@@ -28,7 +28,7 @@ def app():
         if uploaded_file is not None:
             st.session_state.uploaded_file = uploaded_file
 
-            df = pd.read_csv(uploaded_file)
+            df = pd.read_csv(uploaded_file, encoding_errors='ignore')
             m_columns = pd.read_excel(uploaded_tables, sheet_name=6)
             n_columns = pd.read_excel(uploaded_tables, sheet_name=7)
             codes = pd.read_excel(uploaded_tables, sheet_name=0)
