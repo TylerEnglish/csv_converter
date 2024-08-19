@@ -29,18 +29,18 @@ def app():
             st.session_state.uploaded_file = uploaded_file
 
             df = pd.read_csv(uploaded_file)
+            m_columns = pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=6)
+            n_columns = pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=7)
+            codes = pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=0)
+            subjobs = pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=1)
+            dept = pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=2)
+            admin_list = pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=4)
+            t_list = pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=5)
 
             st.subheader("Main Data")
             st.dataframe(df)
 
-            new_df = data_conversion(df,
-                        pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=6),
-                        pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=7),
-                        pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=0),
-                        pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=1),
-                        pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=2),
-                        pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=4),
-                        pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=5))
+            new_df = data_conversion(df,m_columns, n_columns, codes, subjobs, dept, admin_list, t_list)
 
             st.subheader("Converted Data")
             st.dataframe(new_df)
