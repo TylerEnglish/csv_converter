@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from scripts.main_scripts import data_conversion
+from scripts.main_script import data_conversion
 
 
 @st.cache_data
