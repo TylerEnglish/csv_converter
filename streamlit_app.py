@@ -29,13 +29,13 @@ def app():
             st.session_state.uploaded_file = uploaded_file
 
             df = pd.read_csv(uploaded_file)
-            m_columns = pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=6)
-            n_columns = pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=7)
-            codes = pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=0)
-            subjobs = pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=1)
-            dept = pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=2)
-            admin_list = pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=4)
-            t_list = pd.read_excel(open(uploaded_tables, 'rb'), sheet_name=5)
+            m_columns = pd.read_excel(uploaded_tables, sheet_name=6)
+            n_columns = pd.read_excel(uploaded_tables, sheet_name=7)
+            codes = pd.read_excel(uploaded_tables, sheet_name=0)
+            subjobs = pd.read_excel(uploaded_tables, sheet_name=1)
+            dept = pd.read_excel(uploaded_tables, sheet_name=2)
+            admin_list = pd.read_excel(uploaded_tables, sheet_name=4)
+            t_list = pd.read_excel(uploaded_tables, sheet_name=5)
 
             st.subheader("Main Data")
             st.dataframe(df)
