@@ -17,16 +17,6 @@ def float_to_time(h):
 def time_to_float(time) -> float:
     return time.dt.hour
 
-
-def modify_value(val, exclude):
-
-    if val in exclude:
-        return val
-    elif str(val).startswith('1-'):
-        return val
-    else:
-        return '1-' +val
-
 def get_string(df):
     array = df.str.split(' ')
     string = []
@@ -103,7 +93,7 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
     })
 
     # Fill in more of the values
-    df[new_c['Columns'][3]] = df[new_c['Columns'][3]].apply(modify_value,exclude=ad_list['Job'])
+    df[new_c['Columns'][3]] = df[new_c['Columns'][3]].apply(lambda x: f"1-{x}" if x not in ad_list['Job'] else x)
     df[new_c['Columns'][6]] = df[new_c['Columns'][6]].fillna(m_df[m_df.columns[df.columns.get_loc(main_c['Columns'][5])]])
 
     # Fix columns pt 1
