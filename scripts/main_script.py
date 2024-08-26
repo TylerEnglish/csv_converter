@@ -46,7 +46,7 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
     mapping = dict(zip(codes['Name'],codes['Number']))
     mapping_subjobs = dict(zip(subjobs['Job Num'], subjobs['Code']))
     mapping_dept = dict(zip(dept['Job'], dept['Code']))
-    m_df['Filtered'] = m_df[m_df.columns[m_df.columns.get_loc(main_c['Columns'][11])]].apply(lambda x: x.split('- ')[-1] if '-' in x else x)
+    m_df['Filtered'] = m_df[m_df.columns[m_df.columns.get_loc(main_c['Columns'][11])]].apply(lambda x: x.split('- ')[-1] if '-' in str(x) else x)
 
     # Create DataFrame
     df = pd.DataFrame({
