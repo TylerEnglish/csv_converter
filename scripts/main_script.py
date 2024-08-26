@@ -99,7 +99,6 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
     })
 
     # Fill in more of the values
-    df[new_c['Columns'][3]] = df[new_c['Columns'][3]].astype(str)
     df[new_c['Columns'][3]] = df[new_c['Columns'][3]].apply(modify_value,exclude=list)
     df[new_c['Columns'][6]] = df[new_c['Columns'][6]].fillna(m_df[m_df.columns[df.columns.get_loc(main_c['Columns'][5])]])
 
