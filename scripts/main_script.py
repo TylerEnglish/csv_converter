@@ -183,4 +183,4 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
         df[new_c["Columns"][8]]
     )
 
-    return df[df[new_c['Columns'][0]] is not None]
+    return df[df[new_c['Columns'][0]] != None]
