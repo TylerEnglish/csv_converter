@@ -47,7 +47,7 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
     codes = codes.copy()
     subjobs = subjobs.copy()
     dept = dept.copy()
-    list = a_list.copy()
+    ad_list = a_list.copy()
     t_list = t_list.copy()
     new_c = new_columns.copy()
     main_c = main_columns.copy()
@@ -103,7 +103,7 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
     })
 
     # Fill in more of the values
-    df[new_c['Columns'][3]] = df[new_c['Columns'][3]].apply(modify_value,exclude=list['Job'])
+    df[new_c['Columns'][3]] = df[new_c['Columns'][3]].apply(modify_value,exclude=ad_list['Job'])
     df[new_c['Columns'][6]] = df[new_c['Columns'][6]].fillna(m_df[m_df.columns[df.columns.get_loc(main_c['Columns'][5])]])
 
     # Fix columns pt 1
