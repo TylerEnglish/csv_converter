@@ -92,7 +92,7 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
                 )
         ),
 
-        new_c['Columns'][6]: np.where(m_df[m_df.columns[m_df.columns.get_loc(main_c['Columns'][2])]].isin(list),
+        new_c['Columns'][6]: np.where(m_df[m_df.columns[m_df.columns.get_loc(main_c['Columns'][2])]].isin(ad_list['Job']),
                                         'CON-CLOCK', m_df[m_df.columns[m_df.columns.get_loc(main_c['Columns'][3])]]),
 
         new_c['Columns'][7]: None,
@@ -121,7 +121,7 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
     df[new_c['Columns'][11]] = get_string(df[new_c['Columns'][11]])
 
     df[new_c['Columns'][4]] = np.where(
-                    df[new_c['Columns'][11]].isin(t_list),
+                    df[new_c['Columns'][11]].isin(t_list['Name']),
                     df[new_c['Columns'][4]] + '|' + 'MI',
                     df[new_c['Columns'][4]]
     )
