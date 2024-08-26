@@ -37,6 +37,8 @@ def app():
             admin_list = pd.read_excel(uploaded_tables, sheet_name=4)
             t_list = pd.read_excel(uploaded_tables, sheet_name=5)
 
+            st.table(admin_list)
+
             st.subheader("Main Data")
             st.dataframe(df)
 
