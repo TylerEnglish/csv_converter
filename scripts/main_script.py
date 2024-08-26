@@ -93,7 +93,9 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
     })
 
     # Fill in more of the values
-    df[new_c['Columns'][3]] = df[new_c['Columns'][3]].apply(lambda x: f"1-{x}" if x not in ad_list['Job'] and '1-' not in x else x)
+    df[new_c['Columns'][3]] = df[new_c['Columns'][3]].apply(
+    lambda x: f"1-{x}" if x.upper() not in map(str.upper, ad_list['Job']) and '1-' not in str(x) else x
+    )
     df[new_c['Columns'][6]] = df[new_c['Columns'][6]].fillna(m_df[m_df.columns[df.columns.get_loc(main_c['Columns'][5])]])
 
     # Fix columns pt 1
