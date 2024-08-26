@@ -20,7 +20,7 @@ def time_to_float(time) -> float:
 
 def modify_value(val, exclude):
 
-    if val.isin(exclude):
+    if val in exclude:
         return val
     elif str(val).startswith('1-'):
         return val
