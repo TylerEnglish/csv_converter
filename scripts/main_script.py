@@ -19,9 +19,9 @@ def time_to_float(time) -> float:
 
 
 def modify_value(val, exclude):
-    if val not in exclude and not val.startswith('1-'):
-        return '1-' + val
-    return val
+    if str(val) not in exclude and not str(val).startswith('1-'):
+        return '1-' + str(val)
+    return str(val)
 
 def get_string(df):
     array = df.str.split(' ')
@@ -52,7 +52,7 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
     mapping = dict(zip(codes['Name'],codes['Number']))
     mapping_subjobs = dict(zip(subjobs['Job Num'], subjobs['Code']))
     mapping_dept = dict(zip(dept['Job'], dept['Code']))
-    m_df['Filtered'] = m_df[m_df.columns[m_df.columns.get_loc(main_c['Columns'][11])]].apply(lambda x: x.split('- ')[-1] if '-' in str(x) else x)
+    m_df['Filtered'] = m_df[m_df.columns[m_df.columns.get_loc(main_c['Columns'][11])]].apply(lambda x: x.split('- ')[-1] if '-' in str(x) else str(x))
 
     # Create DataFrame
     df = pd.DataFrame({
