@@ -47,8 +47,8 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
     codes = codes.copy()
     subjobs = subjobs.copy()
     dept = dept.copy()
-    list = a_list['Job']
-    t_list = t_list['Name']
+    list = a_list.copy()
+    t_list = t_list.copy()
     new_c = new_columns.copy()
     main_c = main_columns.copy()
   
