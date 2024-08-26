@@ -80,7 +80,7 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
                         m_df['Filtered'].isin(mapping_dept),
                         m_df['Filtered'].map(mapping_dept),
                         np.where(
-                            m_df['Filtered'].isin(list),
+                            m_df['Filtered'].isin(ad_list['Job']),
                             'CON-CLOCK',
                                    np.where(
                                       m_df[m_df.columns[m_df.columns.get_loc(main_c['Columns'][5])]].isin(mapping_subjobs),
