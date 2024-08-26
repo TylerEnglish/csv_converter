@@ -19,9 +19,9 @@ def time_to_float(time) -> float:
 
 
 def modify_value(val, exclude):
-    if str(val) not in exclude and not str(val).startswith('1-'):
-        return '1-' + str(val)
-    return str(val)
+    if val not in exclude and not val.startswith('1-'):
+        return '1-' + val
+    return val
 
 def get_string(df):
     array = df.str.split(' ')
@@ -99,6 +99,7 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
     })
 
     # Fill in more of the values
+    df[new_c['Columns'][3]] = df[new_c['Columns'][3]].astype(str)
     df[new_c['Columns'][3]] = df[new_c['Columns'][3]].apply(modify_value,exclude=list)
     df[new_c['Columns'][6]] = df[new_c['Columns'][6]].fillna(m_df[m_df.columns[df.columns.get_loc(main_c['Columns'][5])]])
 
