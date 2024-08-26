@@ -19,9 +19,13 @@ def time_to_float(time) -> float:
 
 
 def modify_value(val, exclude):
-    if val not in exclude and not val.startswith('1-'):
-        return '1-' + val
-    return val
+
+    if val.isin(exclude):
+        return val
+    elif str(val).startswith('1-'):
+        return val
+    else:
+        return '1-' +val
 
 def get_string(df):
     array = df.str.split(' ')
