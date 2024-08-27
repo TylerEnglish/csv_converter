@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from scripts.main_script import data_conversion
-
+st.set_page_config(layout="wide")
 
 @st.cache_data
 def convert_df(df):
