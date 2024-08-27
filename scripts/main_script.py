@@ -48,22 +48,29 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
     mapping_dept = dict(zip(dept['Job'], dept['Code']))
     m_df['Filtered'] = m_df[m_df.columns[m_df.columns.get_loc(main_c['Columns'][11])]].apply(lambda x: x.split('- ')[-1] if '-' in str(x) else x)
 
-    m_df['DuplicateFlag'] = m_df.duplicated(subset=[m_df.columns[m_df.columns.get_loc(main_c['Columns'][0])], m_df.columns[m_df.columns.get_loc(main_c['Columns'][1])]], keep=False)
-
-    # Step 2: Filter relevant entries (Cost Code '1-950' and 'Per-diem')
-    m_df['IsPerDiem950'] = np.where(
-        (m_df[m_df.columns[m_df.columns.get_loc(main_c['Columns'][7])]] == 'Per-diem') & 
-        (m_df[m_df.columns[m_df.columns.get_loc(main_c['Columns'][2])]] == '1-950'), True, False
+    # Identify and flag entries with duplicates for the same person on the same day
+    m_df['DuplicateFlag'] = m_df.duplicated(
+        subset=[m_df.columns[m_df.columns.get_loc(main_c['Columns'][0])],  # Employee
+                m_df.columns[m_df.columns.get_loc(main_c['Columns'][1])]],  # Date
+        keep=False
     )
 
-    # Step 3: Clean up other Per-diem entries for the same person on the same day
+    # Filter relevant entries (Cost Code '1-950' and 'Per-diem')
+    m_df['IsPerDiem950'] = np.where(
+        (m_df[m_df.columns[m_df.columns.get_loc(main_c['Columns'][7])]] == 'Per-diem') &  # Per-diem
+        (m_df[m_df.columns[m_df.columns.get_loc(main_c['Columns'][2])]] == '1-950'),  # Cost Code Number
+        True,
+        False
+    )
+
+    # Clean up other Per-diem entries for the same person on the same day
     def clear_per_diem(row):
         if row['DuplicateFlag'] and not row['IsPerDiem950']:
             return None  # Remove Per-diem
-        return row[main_c['Columns'][7]]  # Keep original value if conditions aren't met
-    
-    m_df[new_c['Columns'][10]] = m_df.apply(clear_per_diem, axis=1)
-    
+        return row[new_c['Columns'][10]]  # Keep original value if conditions aren't met
+
+    m_df[new_c['Columns'][10]] = m_df.apply(clear_per_diem, axis=1)  # Per Diem $
+
     # Drop the helper columns
     m_df.drop(['DuplicateFlag', 'IsPerDiem950'], axis=1, inplace=True)
     # Create DataFrame
