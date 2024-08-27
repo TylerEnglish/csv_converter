@@ -67,9 +67,10 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
     def clear_per_diem(row):
         if row['DuplicateFlag'] and not row['IsPerDiem950']:
             return None  # Remove Per-diem
-        return row[new_c['Columns'][10]]  # Keep original value if conditions aren't met
+        return row[main_c['Columns'][7]]  # Keep the original Per-diem value if conditions aren't met
 
-    m_df[new_c['Columns'][10]] = m_df.apply(clear_per_diem, axis=1)  # Per Diem $
+    # Apply the clear_per_diem function to the Per-diem column
+    m_df[m_df.columns[m_df.columns.get_loc(main_c['Columns'][7])]] = m_df.apply(clear_per_diem, axis=1)
 
     # Drop the helper columns
     m_df.drop(['DuplicateFlag', 'IsPerDiem950'], axis=1, inplace=True)
