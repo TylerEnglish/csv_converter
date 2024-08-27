@@ -60,7 +60,7 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
     def clear_per_diem(row):
         if row['DuplicateFlag'] and not row['IsPerDiem950']:
             return None  # Remove Per-diem
-        return row[new_c['Columns'][10]]  # Keep original value if conditions aren't met
+        return row[main_c['Columns'][7]]  # Keep original value if conditions aren't met
     
     m_df[new_c['Columns'][10]] = m_df.apply(clear_per_diem, axis=1)
     
