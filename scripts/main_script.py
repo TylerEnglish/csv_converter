@@ -225,7 +225,7 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
     )
 
      # Remove rows where Total Time is 0 and Cost Type is 'LA'
-    df = df[~((df[new_columns['Columns'][9]] == 0) & (df[new_columns['Columns'][4]] == 'LA'))]
+    df = df[~((df[new_columns['Columns'][9]] <= 0) & (df[new_columns['Columns'][4]] == 'LA'))]
 
     # Return the cleaned and adjusted dataframe
     return df[df[new_columns['Columns'][0]].notna() & (df[new_columns['Columns'][0]] != '')]
