@@ -2,6 +2,22 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 
+def time_to_float(time):
+    # Check for NaN or None
+    if pd.isna(time):
+        return np.nan
+    # Check for string inputs and parse them into datetime objects
+    if isinstance(time, str):
+        try:
+            parsed_time = pd.to_datetime(time, format='%I:%M %p')
+            return parsed_time.hour + parsed_time.minute / 60.0
+        except ValueError:
+            return np.nan
+    # If input is already a datetime object, convert to float
+    elif isinstance(time, (datetime, pd.Timestamp)):
+        return time.hour + time.minute / 60.0
+    return np.nan
+
 def float_to_time(h):
     if pd.isna(h):  # Check for NaN
         return None
@@ -12,11 +28,7 @@ def float_to_time(h):
         return time_str
     except:
         return None
-
     
-def time_to_float(time) -> float:
-    return time.dt.hour
-
 def get_string(df):
     array = df.str.split(' ')
     string = []
@@ -147,7 +159,29 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
     )
     df[new_columns['Columns'][11]] = df['new']
     df.drop('new', axis=1, inplace=True)
-    
+
+    # Convert start and stop times from strings or datetime to float
+    df[new_columns["Columns"][7]] = m_df[main_columns['Columns'][9]].apply(time_to_float)
+    df[new_columns["Columns"][8]] = m_df[main_columns['Columns'][10]].apply(time_to_float)
+
+    # Handle missing times
+    # If start time is missing but stop time is present, calculate start time based on stop time - total time
+    mask_start_none = df[new_columns["Columns"][7]].isna() & df[new_columns["Columns"][8]].notna()
+    df.loc[mask_start_none, new_columns["Columns"][7]] = df.loc[mask_start_none, new_columns["Columns"][8]] - df.loc[mask_start_none, new_columns["Columns"][9]]
+
+    # If stop time is missing but start time is present, calculate stop time based on start time + total time
+    mask_stop_none = df[new_columns["Columns"][8]].isna() & df[new_columns["Columns"][7]].notna()
+    df.loc[mask_stop_none, new_columns["Columns"][8]] = df.loc[mask_stop_none, new_columns["Columns"][7]] + df.loc[mask_stop_none, new_columns["Columns"][9]]
+
+    # If both start time and stop time are missing, fill start time with 6.0 (6:00 AM) and calculate stop time based on start time + total time
+    mask_both_none = df[new_columns["Columns"][7]].isna() & df[new_columns["Columns"][8]].isna()
+    df.loc[mask_both_none, new_columns["Columns"][7]] = 6.0  # Default start time to 6:00 AM
+    df.loc[mask_both_none, new_columns["Columns"][8]] = df.loc[mask_both_none, new_columns["Columns"][7]] + df.loc[mask_both_none, new_columns["Columns"][9]]
+
+    # Convert float hours back to formatted time strings
+    df[new_columns["Columns"][7]] = df[new_columns["Columns"][7]].apply(float_to_time)
+    df[new_columns["Columns"][8]] = df[new_columns["Columns"][8]].apply(float_to_time)
+
     # Explode column to handle multiple entries
     df[new_columns['Columns'][4]] = df[new_columns['Columns'][4]].str.split('|')
     df = df.explode(new_columns["Columns"][4]).reset_index(drop=True)
@@ -164,19 +198,6 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
         None,
         df[new_columns["Columns"][11]]
     )
-
-    # Time and float conversion adjustments
-    try:
-        df[new_columns["Columns"][7]] = m_df[m_df.columns[m_df.columns.get_loc(main_columns['Columns'][9])]].apply(time_to_float)
-        df[new_columns["Columns"][8]] = m_df[m_df.columns[m_df.columns.get_loc(main_columns['Columns'][10])]].apply(time_to_float)
-    except:
-        pass
-
-    df[new_columns["Columns"][7]] = df[new_columns["Columns"][7]].fillna(6.0)
-    df[new_columns["Columns"][8]] = df[new_columns["Columns"][8]].fillna(df[new_columns["Columns"][7]] + df[new_columns["Columns"][9]])
-
-    df[new_columns["Columns"][7]] = df[new_columns["Columns"][7]].apply(float_to_time)
-    df[new_columns["Columns"][8]] = df[new_columns["Columns"][8]].apply(float_to_time)
 
     df[new_columns["Columns"][3]] = np.where(
         df[new_columns["Columns"][3]] == 'TRAINING',
