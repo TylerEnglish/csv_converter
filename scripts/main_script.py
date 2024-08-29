@@ -160,9 +160,13 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
     df[new_columns['Columns'][11]] = df['new']
     df.drop('new', axis=1, inplace=True)
 
-    # Convert start and stop times from strings or datetime to float
-    df[new_columns["Columns"][7]] = m_df[main_columns['Columns'][9]].apply(time_to_float)
-    df[new_columns["Columns"][8]] = m_df[main_columns['Columns'][10]].apply(time_to_float)
+    try:
+        # Convert start and stop times from strings or datetime to float
+        df[new_columns["Columns"][7]] = m_df[main_columns['Columns'][9]].apply(time_to_float)
+        df[new_columns["Columns"][8]] = m_df[main_columns['Columns'][10]].apply(time_to_float)
+    except:
+        pass
+
 
     # Handle missing times
     # If start time is missing but stop time is present, calculate start time based on stop time - total time
