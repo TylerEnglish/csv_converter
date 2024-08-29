@@ -135,6 +135,7 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
         new_columns['Columns'][11]: m_df[m_df.columns[m_df.columns.get_loc(main_columns['Columns'][8])]]
     })
 
+
     # Continue applying transformations to the dataframe
     df[new_columns['Columns'][3]] = df[new_columns['Columns'][3]].apply(
         lambda x: f"1-{x}" if isinstance(x, str) and x.upper() not in map(str.upper, a_list['Job']) and '1-' not in x else x
