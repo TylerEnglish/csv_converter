@@ -49,9 +49,9 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
     m_df = main_df.copy()
     
     # Prepare mappings
-    mapping = dict(zip(codes['Name'], codes['Number']))
-    mapping_subjobs = dict(zip(subjobs['Job Num'], subjobs['Code']))
-    mapping_dept = dict(zip(dept['Job'], dept['Code']))
+    mapping = dict(zip(codes['Name'].astype(str), codes['Number']))
+    mapping_subjobs = dict(zip(subjobs['Job Num'].astype(str), subjobs['Code'].astype(str)))
+    mapping_dept = dict(zip(dept['Job'].astype(str), dept['Code'].astype(str)))
 
     # Process the 'Filtered' column for cost code mapping
     m_df['Filtered'] = m_df[m_df.columns[m_df.columns.get_loc(main_columns['Columns'][11])]].apply(
@@ -229,6 +229,17 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
         None,
         df[new_columns["Columns"][8]]
     )
+
+    # Remap for missing values in 
+    # Step 1: Create a condition-based array using np.where
+    condition_result = np.where(
+        df[new_columns['Columns'][6]].isin(mapping_subjobs),
+        df[new_columns['Columns'][6]].isin(mapping_subjobs),
+        None
+    )
+
+    # Step 2: Assign the result to the DataFrame column using fillna
+    df[new_columns["Columns"][5]] = df[new_columns["Columns"][5]].fillna(pd.Series(condition_result, index=df.index))
 
      # Remove rows where Total Time is 0 and Cost Type is 'LA'
     df = df[~((df[new_columns['Columns'][9]] == 0) & (df[new_columns['Columns'][4]] == 'LA'))]
