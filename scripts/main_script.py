@@ -239,7 +239,7 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
         df[new_columns["Columns"][6]].map(mapping_dept)
     )
 
-     df[new_columns["Columns"][3]] = np.where(
+    df[new_columns["Columns"][3]] = np.where(
         df[new_columns["Columns"][4]].isin(['PD', 'MI']),
         '1-950',
         df[new_columns["Columns"][3]]
