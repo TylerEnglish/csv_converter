@@ -231,15 +231,13 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
     )
 
     # Remap for missing values in 
-    # Step 1: Create a condition-based array using np.where
-    condition_result = np.where(
-        df[new_columns['Columns'][6]].isin(mapping_subjobs),
-        df[new_columns['Columns'][6]].isin(mapping_subjobs),
-        None
+    # Step 1: Ensure columns are strings for proper mapping and matching
+    df[new_columns["Columns"][6]] = df[new_columns["Columns"][6]].astype(str)  # Ensure Project Number is string
+    
+    # Step 2: Fill missing values in 'Dept' (Column 5) using the mapping based on 'Project Number' (Column 6)
+    df[new_columns["Columns"][5]] = df[new_columns["Columns"][5]].fillna(
+        df[new_columns["Columns"][6]].map(mapping_dept)
     )
-
-    # Step 2: Assign the result to the DataFrame column using fillna
-    df[new_columns["Columns"][5]] = df[new_columns["Columns"][5]].fillna(pd.Series(condition_result, index=df.index))
 
      # Remove rows where Total Time is 0 and Cost Type is 'LA'
     df = df[~((df[new_columns['Columns'][9]] == 0) & (df[new_columns['Columns'][4]] == 'LA'))]
