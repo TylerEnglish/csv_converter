@@ -44,9 +44,9 @@ def app():
             st.dataframe(df)
 
             new_df, approval_df = data_conversion(df,m_columns, n_columns, codes, subjobs, dept, admin_list, t_list)
-
-            approval_df['Current Date'] = datetime.now()
             approval_df = approval_df[headers]
+            approval_df['Current Date'] = datetime.now()
+            
             st.subheader("Still Waiting for Approval")
             st.dataframe(approval_df)
 
