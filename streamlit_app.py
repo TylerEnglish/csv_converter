@@ -3,7 +3,7 @@ import pandas as pd
 from scripts.main_script import data_conversion
 from datetime import datetime
 st.set_page_config(layout="wide")
-header = st.secrets["APPROVAL_HEAD"]
+headers = st.secrets["APPROVAL_HEAD"]
 
 @st.cache_data
 def convert_df(df):
