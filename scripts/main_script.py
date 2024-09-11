@@ -48,6 +48,7 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
     # Create a copy of the main dataframe to avoid modifying the original data
     df = main_df.copy()
     m_df = df[~df['Status'].isin(['pending', 'reviewed'])]
+    n_approval_df = df[df['Status'].isin(['pending', 'reviewed'])]
     # Prepare mappings
     mapping = dict(zip(codes['Name'].astype(str), codes['Number']))
     mapping_subjobs = dict(zip(subjobs['Job Num'].astype(str), subjobs['Code'].astype(str)))
@@ -248,6 +249,6 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
     df = df[~((df[new_columns['Columns'][9]] == 0) & (df[new_columns['Columns'][4]] == 'LA'))]
 
     # Return the cleaned and adjusted dataframe
-    return df[df[new_columns['Columns'][0]].notna() & (df[new_columns['Columns'][0]] != '')]
+    return df[df[new_columns['Columns'][0]].notna() & (df[new_columns['Columns'][0]] != '')], n_approval_df
 
 
