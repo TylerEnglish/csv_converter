@@ -41,7 +41,10 @@ def app():
             st.subheader("Main Data")
             st.dataframe(df)
 
-            new_df = data_conversion(df,m_columns, n_columns, codes, subjobs, dept, admin_list, t_list)
+            new_df, approval_df = data_conversion(df,m_columns, n_columns, codes, subjobs, dept, admin_list, t_list)
+
+            st.subheader("Still Waiting for Approval")
+            st.dataframe(approval_df)
 
             st.subheader("Converted Data")
             st.dataframe(new_df)
