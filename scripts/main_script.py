@@ -45,11 +45,9 @@ def get_string(df):
     
 # Adjusting the function to handle both cases correctly as described
 def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_list, t_list):
-    # Create a copy of the main dataframe to avoid modifying the original data
     df = main_df.copy()
     m_df = df[~df['Status'].isin(['pending', 'reviewed'])].copy()
-    n_approval_df = df[df['Status'].isin(['pending', 'reviewed'])].copy()
-    # Prepare mappings
+    n_approval_df = df[df['Status'].isin(['pending', 'reviewed'])].copy()=
     mapping = dict(zip(codes['Name'].astype(str), codes['Number']))
     mapping_subjobs = dict(zip(subjobs['Job Num'].astype(str), subjobs['Code'].astype(str)))
     mapping_dept = dict(zip(dept['Job'].astype(str), dept['Code'].astype(str)))
@@ -60,34 +58,25 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
 
     # Identify and flag entries with duplicates for the same person on the same day
     m_df['DuplicateFlag'] = m_df.duplicated(
-        subset=[m_df.columns[m_df.columns.get_loc(main_columns['Columns'][0])],  # Employee
-                m_df.columns[m_df.columns.get_loc(main_columns['Columns'][1])]],  # Date
+        subset=[m_df.columns[m_df.columns.get_loc(main_columns['Columns'][0])], 
+                m_df.columns[m_df.columns.get_loc(main_columns['Columns'][1])]],  
         keep=False
     )
 
-    # Filter relevant entries (Cost Code '1-950' and 'Per-diem')
     m_df['IsPerDiem950'] = np.where(
-        (m_df[m_df.columns[m_df.columns.get_loc(main_columns['Columns'][7])]] == 'Per-diem') &  # Per-diem
-        (m_df[m_df.columns[m_df.columns.get_loc(main_columns['Columns'][2])]] == '1-950'),  # Cost Code Number
+        (m_df[m_df.columns[m_df.columns.get_loc(main_columns['Columns'][7])]] == 'Per-diem') &  
+        (m_df[m_df.columns[m_df.columns.get_loc(main_columns['Columns'][2])]] == '1-950'), 
         True,
         False
     )
-
-    # Clean up other Per-diem entries for the same person on the same day
+    
     def clear_per_diem(row):
         if row['DuplicateFlag'] and not row['IsPerDiem950']:
-            return None  # Remove Per-diem
-        return row[main_columns['Columns'][7]]  # Keep the original Per-diem value if conditions aren't met
-
-    # Apply the clear_per_diem function to the Per-diem column
+            return None 
+        return row[main_columns['Columns'][7]] 
     m_df[m_df.columns[m_df.columns.get_loc(main_columns['Columns'][7])]] = m_df.apply(clear_per_diem, axis=1)
-
-    # Drop the helper columns
     m_df.drop(['DuplicateFlag', 'IsPerDiem950'], axis=1, inplace=True)
 
-    # Continue with your data conversion steps...
-
-    # Create the new DataFrame based on the required columns
     df = pd.DataFrame({
         new_columns['Columns'][0]: m_df[m_df.columns[m_df.columns.get_loc(main_columns['Columns'][0])]],
 
@@ -136,15 +125,12 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
         new_columns['Columns'][11]: m_df[m_df.columns[m_df.columns.get_loc(main_columns['Columns'][8])]]
     })
 
-
-    # Continue applying transformations to the dataframe
     df[new_columns['Columns'][3]] = df[new_columns['Columns'][3]].apply(
         lambda x: f"1-{x}" if isinstance(x, str) and x.upper() not in map(str.upper, a_list['Job']) and '1-' not in x else x
     )
     df[new_columns['Columns'][6]] = df[new_columns['Columns'][6]].fillna(m_df[main_columns['Columns'][5]].reindex(df.index))
 
-
-    # Fix columns and find conditions
+    # fix columns
     df[new_columns['Columns'][4]] = df[new_columns['Columns'][4]].fillna('LA')
     df[new_columns['Columns'][4]] = np.where(
         df[new_columns['Columns'][10]] == -55,
@@ -164,36 +150,29 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
     df.drop('new', axis=1, inplace=True)
 
     try:
-        # Convert start and stop times from strings or datetime to float
         df[new_columns["Columns"][7]] = m_df[main_columns['Columns'][9]].apply(time_to_float)
         df[new_columns["Columns"][8]] = m_df[main_columns['Columns'][10]].apply(time_to_float)
     except:
         pass
 
 
-    # Handle missing times
-    # If start time is missing but stop time is present, calculate start time based on stop time - total time
+    # Handle missing times=
     mask_start_none = df[new_columns["Columns"][7]].isna() & df[new_columns["Columns"][8]].notna()
     df.loc[mask_start_none, new_columns["Columns"][7]] = df.loc[mask_start_none, new_columns["Columns"][8]] - df.loc[mask_start_none, new_columns["Columns"][9]]
 
-    # If stop time is missing but start time is present, calculate stop time based on start time + total time
     mask_stop_none = df[new_columns["Columns"][8]].isna() & df[new_columns["Columns"][7]].notna()
     df.loc[mask_stop_none, new_columns["Columns"][8]] = df.loc[mask_stop_none, new_columns["Columns"][7]] + df.loc[mask_stop_none, new_columns["Columns"][9]]
 
-    # If both start time and stop time are missing, fill start time with 6.0 (6:00 AM) and calculate stop time based on start time + total time
     mask_both_none = df[new_columns["Columns"][7]].isna() & df[new_columns["Columns"][8]].isna()
-    df.loc[mask_both_none, new_columns["Columns"][7]] = 6.0  # Default start time to 6:00 AM
+    df.loc[mask_both_none, new_columns["Columns"][7]] = 6.0  
     df.loc[mask_both_none, new_columns["Columns"][8]] = df.loc[mask_both_none, new_columns["Columns"][7]] + df.loc[mask_both_none, new_columns["Columns"][9]]
 
-    # Convert float hours back to formatted time strings
     df[new_columns["Columns"][7]] = df[new_columns["Columns"][7]].apply(float_to_time)
     df[new_columns["Columns"][8]] = df[new_columns["Columns"][8]].apply(float_to_time)
 
-    # Explode column to handle multiple entries
     df[new_columns['Columns'][4]] = df[new_columns['Columns'][4]].str.split('|')
     df = df.explode(new_columns["Columns"][4]).reset_index(drop=True)
 
-    # Apply necessary corrections for 'LA', 'MI', and 'PD' tags
     df[new_columns["Columns"][10]] = np.where(
         df[new_columns['Columns'][4]].isin(['LA', 'MI']),
         None,
@@ -212,7 +191,6 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
         df[new_columns["Columns"][3]]
     )
 
-    # Further adjustments to columns based on conditions
     df[new_columns["Columns"][9]] = np.where(
         df[new_columns["Columns"][4]].isin(['PD', 'MI']),
         None,
@@ -232,10 +210,8 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
     )
 
     # Remap for missing values in 
-    # Step 1: Ensure columns are strings for proper mapping and matching
-    df[new_columns["Columns"][6]] = df[new_columns["Columns"][6]].astype(str)  # Ensure Project Number is string
+    df[new_columns["Columns"][6]] = df[new_columns["Columns"][6]].astype(str)  
     
-    # Step 2: Fill missing values in 'Dept' (Column 5) using the mapping based on 'Project Number' (Column 6)
     df[new_columns["Columns"][5]] = df[new_columns["Columns"][5]].fillna(
         df[new_columns["Columns"][6]].map(mapping_dept)
     )
@@ -245,10 +221,8 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
         '1-950',
         df[new_columns["Columns"][3]]
     )
-     # Remove rows where Total Time is 0 and Cost Type is 'LA'
     df = df[~((df[new_columns['Columns'][9]] == 0) & (df[new_columns['Columns'][4]] == 'LA'))]
 
-    # Return the cleaned and adjusted dataframe
     return df[df[new_columns['Columns'][0]].notna() & (df[new_columns['Columns'][0]] != '')], n_approval_df
 
 
