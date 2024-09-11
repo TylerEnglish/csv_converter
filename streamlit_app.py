@@ -1,7 +1,9 @@
 import streamlit as st
 import pandas as pd
 from scripts.main_script import data_conversion
+from datetime import datetime
 st.set_page_config(layout="wide")
+header = st.secrets["APPROVAL_HEAD"]
 
 @st.cache_data
 def convert_df(df):
@@ -43,6 +45,8 @@ def app():
 
             new_df, approval_df = data_conversion(df,m_columns, n_columns, codes, subjobs, dept, admin_list, t_list)
 
+            approval_df['Current Date'] = datetime.now()
+            approval_df = approval_df[headers]
             st.subheader("Still Waiting for Approval")
             st.dataframe(approval_df)
 
