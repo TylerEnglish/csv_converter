@@ -45,8 +45,9 @@ def get_string(df):
     
 # Adjusting the function to handle both cases correctly as described
 def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_list, t_list):
+    df = main_df.copy()
     m_df = main_df.copy()
-    n_approval_df = main_df[df['Status'].isin(['pending', 'reviewed'])].copy()
+    n_approval_df = df[df['Status'].isin(['pending', 'reviewed'])].copy()
     mapping = dict(zip(codes['Name'].astype(str), codes['Number']))
     mapping_subjobs = dict(zip(subjobs['Job Num'].astype(str), subjobs['Code'].astype(str)))
     mapping_dept = dict(zip(dept['Job'].astype(str), dept['Code'].astype(str)))
