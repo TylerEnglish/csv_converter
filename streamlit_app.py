@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import pytz
 from scripts.main_script import data_conversion
 from datetime import datetime
 st.set_page_config(layout="wide")
@@ -46,6 +47,9 @@ def app():
             new_df, approval_df = data_conversion(df,m_columns, n_columns, codes, subjobs, dept, admin_list, t_list)
             approval_df = approval_df[headers]
             approval_df['Current Date'] = datetime.now()
+            approval_df['Current Date'] = pd.to_datetime(approval_df['Current Date'], utc=True)
+            central_time_zone = pytz.timezone('US/Central')
+            approval_df['Current Date'] = approval_df['Current Date'].dt.tz_convert(central_time_zone)
             
             st.subheader("Still Waiting for Approval")
             st.dataframe(approval_df)
