@@ -51,11 +51,18 @@ def app():
             central_time_zone = pytz.timezone('US/Central')
             approval_df['Current Date'] = approval_df['Current Date'].dt.tz_convert(central_time_zone)
             
-            
+            current_time_central = datetime.now(pytz.utc).astimezone(central_time_zone)
+            file_name = f"{current_time_central.strftime('%Y-%m-%d_%H-%M-%S')}_wait.csv"
+            csv_data = approval_df.to_csv(index=False)
+
             st.subheader("Still Waiting for Approval")
             st.dataframe(approval_df)
-
-            
+            st.download_button(
+                label='Waiting for Approval',
+                data=csv_data,
+                file_name=file_name,
+                mime='text/csv'
+            )
 
             st.subheader("Converted Data")
             st.dataframe(new_df)
