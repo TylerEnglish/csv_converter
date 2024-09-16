@@ -50,19 +50,12 @@ def app():
             approval_df['Current Date'] = pd.to_datetime(approval_df['Current Date'], utc=True)
             central_time_zone = pytz.timezone('US/Central')
             approval_df['Current Date'] = approval_df['Current Date'].dt.tz_convert(central_time_zone)
-            current_time_utc = datetime.now(pytz.utc)
-            current_datetime_ct = current_datetime_utc.astimezone(central_time_zone)
             
             
             st.subheader("Still Waiting for Approval")
             st.dataframe(approval_df)
 
-            st.download_button(
-                label="Download Wait List",
-                data=approval_df,
-                file_name=f"{current_datetime_ct}_wait_list.csv",
-                mime='text/csv',
-            )
+            
 
             st.subheader("Converted Data")
             st.dataframe(new_df)
