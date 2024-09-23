@@ -2,20 +2,36 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 
-def time_to_float(time):
+def time_to_float(time_value):
     # Check for NaN or None
-    if pd.isna(time):
+    if pd.isna(time_value):
         return np.nan
+    
+    # Convert datetime objects to string in 'h:m:s AM/PM' format
+    if isinstance(time_value, (datetime, pd.Timestamp)):
+        # Convert to string in the appropriate format
+        time_value = time_value.strftime('%I:%M:%S %p')
+    # If input is already a datetime.time object, convert to float
+    elif isinstance(time_value, time):
+        return time_value.hour + time_value.minute / 60.0 + time_value.second / 3600.0
+    
     # Check for string inputs and parse them into datetime objects
-    if isinstance(time, str):
+    if isinstance(time_value, str):
         try:
-            parsed_time = pd.to_datetime(time, format='%I:%M %p')
+            # Normalize time strings without space between time and AM/PM
+            if 'AM' in time_value or 'PM' in time_value:
+                time_value = time_value.replace('AM', ' AM').replace('PM', ' PM')
+            # Check if the string has seconds by counting the ':' characters
+            if time_value.count(':') == 2:  # Handles formats with seconds like '12:00:00 AM'
+                parsed_time = pd.to_datetime(time_value, format='%I:%M:%S %p')
+            elif time_value.count(':') == 1:  # Handles formats without seconds like '12:00 AM'
+                parsed_time = pd.to_datetime(time_value, format='%I:%M %p')
+            else:  # Handles formats with only hour '12 PM'
+                parsed_time = pd.to_datetime(time_value, format='%I %p')
             return parsed_time.hour + parsed_time.minute / 60.0
         except ValueError:
             return np.nan
-    # If input is already a datetime object, convert to float
-    elif isinstance(time, (datetime, pd.Timestamp)):
-        return time.hour + time.minute / 60.0
+        
     return np.nan
 
 def float_to_time(h):
@@ -29,19 +45,22 @@ def float_to_time(h):
     except:
         return None
     
+
 def get_string(df):
-    array = df.str.split(' ')
+    # Convert all values to strings where applicable, handle None values
     string = []
+    for value in df:
+        if pd.isna(value):  # Check for NaN and append NaN
+            string.append(np.nan)
+        elif isinstance(value, str):  # If value is already a string, split it
+            split_value = value.split(' ')
+            string.append(split_value[0] if len(split_value) > 0 else None)
+        else:  # Convert non-string types to string and then split
+            str_value = str(value)
+            split_value = str_value.split(' ')
+            string.append(split_value[0] if len(split_value) > 0 else None)
 
-    for a in array:
-        if type(a) is list:
-            string.append(a[0])
-        else:
-            string.append(a)
-    
-    return string
-    
-
+    return string    
     
 # Adjusting the function to handle both cases correctly as described
 def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_list, t_list):
@@ -164,6 +183,25 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
 
     df[new_columns["Columns"][7]] = df[new_columns["Columns"][7]].apply(float_to_time)
     df[new_columns["Columns"][8]] = df[new_columns["Columns"][8]].apply(float_to_time)
+
+    # Fix time if enter multiple times
+    df[new_columns["Columns"][7]] = pd.to_datetime(df[new_columns["Columns"][2]] + ' ' + df[new_columns["Columns"][7]])
+    df[new_columns["Columns"][8]] = pd.to_datetime(df[new_columns["Columns"][2]] + ' ' + df[new_columns["Columns"][8]])
+
+    df = df.sort_values(by=[new_columns["Columns"][0], new_columns["Columns"][2], new_columns["Columns"][7]])
+
+    for i in range(1, len(df)):
+        if df.loc[i, new_columns["Columns"][0]] == df.loc[i-1, new_columns["Columns"][0]] and df.loc[i, new_columns["Columns"][2]] == df.loc[i-1, new_columns["Columns"][2]]:
+            # Check if the start time is before or equals the previous stop time
+            if df.loc[i, new_columns["Columns"][7]] <= df.loc[i-1, new_columns["Columns"][8]]:
+                # Set the start time to one minute after the previous stop time
+                df.loc[i, new_columns["Columns"][7]] = df.loc[i-1, new_columns["Columns"][8]] + timedelta(minutes=1)
+                # Adjust the stop time based on the new start time and total time
+                df.loc[i, new_columns["Columns"][8]] = df.loc[i, new_columns["Columns"][7]] + timedelta(hours=int(df.loc[i, new_columns["Columns"][9]]))
+
+    # Convert Start Time and Stop Time back to the desired format
+    df[new_columns["Columns"][7]] = df[new_columns["Columns"][7]].dt.strftime('%I:%M %p')
+    df[new_columns["Columns"][8]] = df[new_columns["Columns"][8]].dt.strftime('%I:%M %p')
 
     df[new_columns['Columns'][4]] = df[new_columns['Columns'][4]].str.split('|')
     df = df.explode(new_columns["Columns"][4]).reset_index(drop=True)
