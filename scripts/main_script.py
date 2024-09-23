@@ -70,11 +70,6 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
         False
     )
     
-    def clear_per_diem(row):
-        if row['DuplicateFlag'] and not row['IsPerDiem950']:
-            return None 
-        return row[main_columns['Columns'][7]] 
-    m_df[m_df.columns[m_df.columns.get_loc(main_columns['Columns'][7])]] = m_df.apply(clear_per_diem, axis=1)
     m_df.drop(['DuplicateFlag', 'IsPerDiem950'], axis=1, inplace=True)
 
     df = pd.DataFrame({
