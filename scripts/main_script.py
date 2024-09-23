@@ -178,7 +178,7 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
     df.loc[mask_stop_none, new_columns["Columns"][8]] = df.loc[mask_stop_none, new_columns["Columns"][7]] + df.loc[mask_stop_none, new_columns["Columns"][9]]
 
     mask_both_none = df[new_columns["Columns"][7]].isna() & df[new_columns["Columns"][8]].isna()
-    df.loc[mask_both_none, new_columns["Columns"][7]] = 6.0  
+    df.loc[mask_both_none, new_columns["Columns"][7]] = 1.0  
     df.loc[mask_both_none, new_columns["Columns"][8]] = df.loc[mask_both_none, new_columns["Columns"][7]] + df.loc[mask_both_none, new_columns["Columns"][9]]
 
     df[new_columns["Columns"][7]] = df[new_columns["Columns"][7]].apply(float_to_time)
