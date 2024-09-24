@@ -205,7 +205,7 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
             # Check if the start time overlaps with the previous stop time
             if df.loc[df.index[i], new_columns["Columns"][7]] <= df.loc[df.index[i-1], new_columns["Columns"][8]]:
                 # Set the start time to one minute after the previous stop time
-                df.loc[df.index[i], new_columns["Columns"][7]] = df.loc[df.index[i-1], new_columns["Columns"][8]] + timedelta(minutes=1)
+                df.loc[df.index[i], new_columns["Columns"][7]] = df.loc[df.index[i-1], new_columns["Columns"][8]] + timedelta(minutes=4)
                 # Adjust the stop time based on the new start time and total time
                 df.loc[df.index[i], new_columns["Columns"][8]] = df.loc[df.index[i], new_columns["Columns"][7]] + timedelta(hours=df.loc[df.index[i], new_columns["Columns"][9]])
 
