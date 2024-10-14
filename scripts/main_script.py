@@ -66,7 +66,7 @@ def get_string(df):
 def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_list, t_list):
     df = main_df.copy()
     m_df = main_df.copy()
-    n_approval_df = df[df['Status'].isin(['pending', 'reviewed'])].copy()
+    n_approval_df = df[df['Status'].isin(['pending', 'reviewed','Pending','Reviewed'])].copy()
     mapping = dict(zip(codes['Name'].astype(str), codes['Number']))
     mapping_subjobs = dict(zip(subjobs['Job Num'].astype(str), subjobs['Code'].astype(str)))
     mapping_dept = dict(zip(dept['Job'].astype(str), dept['Code'].astype(str)))
