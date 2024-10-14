@@ -7,42 +7,49 @@ def time_to_float(time_value):
     if pd.isna(time_value):
         return np.nan
     
-    # Convert datetime objects to string in 'h:m:s AM/PM' format
-    if isinstance(time_value, (datetime, pd.Timestamp)):
-        # Convert to string in the appropriate format
-        time_value = time_value.strftime('%I:%M:%S %p')
-    # If input is already a datetime.time object, convert to float
-    elif isinstance(time_value, time):
+    # If it's a datetime.time object, convert to float (hours)
+    if isinstance(time_value, time):
         return time_value.hour + time_value.minute / 60.0 + time_value.second / 3600.0
     
-    # Check for string inputs and parse them into datetime objects
+    # If it's a datetime or Timestamp object, extract the time part and convert to float
+    if isinstance(time_value, (datetime, pd.Timestamp)):
+        time_value = time_value.time()  # Convert datetime to time object
+        return time_value.hour + time_value.minute / 60.0 + time_value.second / 3600.0
+    
+    # If the input is a string, try to parse it
     if isinstance(time_value, str):
         try:
             # Normalize time strings without space between time and AM/PM
             if 'AM' in time_value or 'PM' in time_value:
                 time_value = time_value.replace('AM', ' AM').replace('PM', ' PM')
-            # Check if the string has seconds by counting the ':' characters
+            
+            # Parse based on the format (with or without seconds)
             if time_value.count(':') == 2:  # Handles formats with seconds like '12:00:00 AM'
-                parsed_time = pd.to_datetime(time_value, format='%I:%M:%S %p')
+                parsed_time = pd.to_datetime(time_value, format='%I:%M:%S %p').time()
             elif time_value.count(':') == 1:  # Handles formats without seconds like '12:00 AM'
-                parsed_time = pd.to_datetime(time_value, format='%I:%M %p')
-            else:  # Handles formats with only hour '12 PM'
-                parsed_time = pd.to_datetime(time_value, format='%I %p')
+                parsed_time = pd.to_datetime(time_value, format='%I:%M %p').time()
+            else:  # Handles formats like '12 PM'
+                parsed_time = pd.to_datetime(time_value, format='%I %p').time()
+
+            # Convert parsed time to float (hours)
             return parsed_time.hour + parsed_time.minute / 60.0
-        except ValueError:
+        except (ValueError, TypeError):
             return np.nan
-        
+
     return np.nan
 
 def float_to_time(h):
     if pd.isna(h):  # Check for NaN
         return None
     try:
+        # Create a timedelta from the float hours
         time_delta = timedelta(hours=h)
-        base_time = datetime(1, 1, 1) + time_delta
-        time_str = base_time.strftime('%I:%M %p')
-        return time_str
-    except:
+        # Use an arbitrary base date (January 1, 1) and add the time delta
+        base_time = (datetime.min + time_delta).time()  # Extract just the time part
+        # Format the time string in the desired format
+        return base_time.strftime('%I:%M %p')
+    except Exception as e:
+        print(f"Error converting float to time: {e}")
         return None
     
 
