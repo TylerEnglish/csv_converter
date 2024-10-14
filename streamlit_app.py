@@ -2,8 +2,7 @@ import streamlit as st
 import pandas as pd
 import pytz
 from scripts.main_script import data_conversion
-from datetime import datetime
-import time
+from datetime import datetime, time
 st.set_page_config(layout="wide")
 headers = st.secrets["APPROVAL_HEAD"]
 
