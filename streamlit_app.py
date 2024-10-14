@@ -3,6 +3,7 @@ import pandas as pd
 import pytz
 from scripts.main_script import data_conversion
 from datetime import datetime
+import time
 st.set_page_config(layout="wide")
 headers = st.secrets["APPROVAL_HEAD"]
 
