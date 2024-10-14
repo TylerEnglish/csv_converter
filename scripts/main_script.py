@@ -177,32 +177,45 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
     except Exception as e:
         print(f"Error converting time to float: {e}")
         pass
-
-    # Handle missing times
+    
+    # Handle missing times (logic remains the same)
     mask_start_none = df[new_columns["Columns"][7]].isna() & df[new_columns["Columns"][8]].notna()
     df.loc[mask_start_none, new_columns["Columns"][7]] = df.loc[mask_start_none, new_columns["Columns"][8]] - df.loc[mask_start_none, new_columns["Columns"][9]]
-
+    
     mask_stop_none = df[new_columns["Columns"][8]].isna() & df[new_columns["Columns"][7]].notna()
     df.loc[mask_stop_none, new_columns["Columns"][8]] = df.loc[mask_stop_none, new_columns["Columns"][7]] + df.loc[mask_stop_none, new_columns["Columns"][9]]
-
+    
     mask_both_none = df[new_columns["Columns"][7]].isna() & df[new_columns["Columns"][8]].isna()
     df.loc[mask_both_none, new_columns["Columns"][7]] = 6.0  # Start at midnight
     df.loc[mask_both_none, new_columns["Columns"][8]] = df.loc[mask_both_none, new_columns["Columns"][7]] + df.loc[mask_both_none, new_columns["Columns"][9]]
-
+    
     # Convert float hours back to time strings
     df[new_columns["Columns"][7]] = df[new_columns["Columns"][7]].apply(float_to_time)
     df[new_columns["Columns"][8]] = df[new_columns["Columns"][8]].apply(float_to_time)
-
+    
     # Temporary conversion of the 'Date' column to datetime to combine with times
-    temp_dates = pd.to_datetime(df[new_columns["Columns"][2]], format='%m/%d/%Y')  # Explicit date format
-
+    temp_dates = pd.to_datetime(df[new_columns["Columns"][2]], format='%m/%d/%Y', errors='coerce')  # Use 'coerce' to handle invalid dates
+    
     # Combine 'Date' and 'Start/Stop Time' to create datetime objects for internal processing
-    df[new_columns["Columns"][7]] = pd.to_datetime(temp_dates.astype(str) + ' ' + df[new_columns["Columns"][7]], format='%Y-%m-%d %I:%M %p')
-    df[new_columns["Columns"][8]] = pd.to_datetime(temp_dates.astype(str) + ' ' + df[new_columns["Columns"][8]], format='%Y-%m-%d %I:%M %p')
-
+    df[new_columns["Columns"][7]] = pd.to_datetime(
+        temp_dates.astype(str) + ' ' + df[new_columns["Columns"][7]], 
+        format='%Y-%m-%d %I:%M %p', 
+        errors='coerce'  # Use 'coerce' to handle invalid time formats
+    )
+    
+    df[new_columns["Columns"][8]] = pd.to_datetime(
+        temp_dates.astype(str) + ' ' + df[new_columns["Columns"][8]], 
+        format='%Y-%m-%d %I:%M %p', 
+        errors='coerce'  # Use 'coerce' to handle invalid time formats
+    )
+    
+    # After conversion, replace NaT values with None
+    df[new_columns["Columns"][7]] = df[new_columns["Columns"][7]].where(df[new_columns["Columns"][7]].notna(), None)
+    df[new_columns["Columns"][8]] = df[new_columns["Columns"][8]].where(df[new_columns["Columns"][8]].notna(), None)
+    
     # Sort by employee, date, and start time
     df.sort_values(by=[new_columns["Columns"][0], new_columns["Columns"][2], new_columns["Columns"][7]], inplace=True)
-
+    
     # Loop through and adjust overlapping times for the same person on the same day
     for i in range(1, len(df)):
         # Check if it's the same person on the same day
@@ -210,18 +223,18 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
         df.loc[df.index[i], new_columns["Columns"][2]] == df.loc[df.index[i-1], new_columns["Columns"][2]]:
             
             # Check if the start time overlaps with the previous stop time
-            if df.loc[df.index[i], new_columns["Columns"][7]] <= df.loc[df.index[i-1], new_columns["Columns"][8]]:
+            if df.loc[df.index[i], new_columns["Columns"][7]] and df.loc[df.index[i], new_columns["Columns"][7]] <= df.loc[df.index[i-1], new_columns["Columns"][8]]:
                 # Set the start time to one minute after the previous stop time
                 df.loc[df.index[i], new_columns["Columns"][7]] = df.loc[df.index[i-1], new_columns["Columns"][8]] + timedelta(minutes=4)
                 # Adjust the stop time based on the new start time and total time
                 df.loc[df.index[i], new_columns["Columns"][8]] = df.loc[df.index[i], new_columns["Columns"][7]] + timedelta(hours=df.loc[df.index[i], new_columns["Columns"][9]])
-
+    
     # Convert 'Start Time' and 'Stop Time' back to the desired string format
-    df[new_columns["Columns"][7]] = df[new_columns["Columns"][7]].dt.strftime('%I:%M %p')
-    df[new_columns["Columns"][8]] = df[new_columns["Columns"][8]].dt.strftime('%I:%M %p')
-
+    df[new_columns["Columns"][7]] = df[new_columns["Columns"][7]].dt.strftime('%I:%M %p').where(df[new_columns["Columns"][7]].notna(), None)
+    df[new_columns["Columns"][8]] = df[new_columns["Columns"][8]].dt.strftime('%I:%M %p').where(df[new_columns["Columns"][8]].notna(), None)
+    
     # Revert the 'Date' column back to its original format (MM/DD/YYYY)
-    df[new_columns["Columns"][2]] = temp_dates.dt.strftime('%m/%d/%Y')
+    df[new_columns["Columns"][2]] = temp_dates.dt.strftime('%m/%d/%Y').where(temp_dates.notna(), None)
 
     df[new_columns['Columns'][4]] = df[new_columns['Columns'][4]].str.split('|')
     df = df.explode(new_columns["Columns"][4]).reset_index(drop=True)
