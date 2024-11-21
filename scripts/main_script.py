@@ -188,6 +188,11 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
     mask_both_none = df[new_columns["Columns"][7]].isna() & df[new_columns["Columns"][8]].isna()
     df.loc[mask_both_none, new_columns["Columns"][7]] = 6.0  # Start at midnight
     df.loc[mask_both_none, new_columns["Columns"][8]] = df.loc[mask_both_none, new_columns["Columns"][7]] + df.loc[mask_both_none, new_columns["Columns"][9]]
+
+    # **Adjust Start Times before 6 AM by adding 1 hour**
+    df[new_columns["Columns"][7]] = df[new_columns["Columns"][7]].apply(
+        lambda x: x + 1.0 if pd.notna(x) and x < 6.0 else x
+    )
     
     # Convert float hours back to time strings
     df[new_columns["Columns"][7]] = df[new_columns["Columns"][7]].apply(float_to_time)
