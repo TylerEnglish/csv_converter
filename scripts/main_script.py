@@ -189,11 +189,11 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
     df.loc[mask_both_none, new_columns["Columns"][7]] = 6.0  # Start at midnight
     df.loc[mask_both_none, new_columns["Columns"][8]] = df.loc[mask_both_none, new_columns["Columns"][7]] + df.loc[mask_both_none, new_columns["Columns"][9]]
 
-    # **Adjust Start Times before 6 AM by adding 1 hour**
-    df[new_columns["Columns"][7]] = df[new_columns["Columns"][7]].apply(
-        lambda x: x + 1.0 if pd.notna(x) and x < 6.0 else x
-    )
-    
+    # **Shift Start and Stop Times by +1 Hour if Start Time is Before 6:00 AM**
+    shift_mask = (df[new_columns["Columns"][7]] < 6.0) & (df[new_columns["Columns"][7]].notna())
+    df.loc[shift_mask, new_columns["Columns"][7]] += 1.0  # Shift Start Time
+    df.loc[shift_mask, new_columns["Columns"][8]] += 1.0  # Shift Stop Time
+        
     # Convert float hours back to time strings
     df[new_columns["Columns"][7]] = df[new_columns["Columns"][7]].apply(float_to_time)
     df[new_columns["Columns"][8]] = df[new_columns["Columns"][8]].apply(float_to_time)
