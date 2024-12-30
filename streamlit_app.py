@@ -4,7 +4,7 @@ import pytz
 from scripts.main_script import data_conversion
 from datetime import datetime, time
 st.set_page_config(layout="wide")
-headers = st.secrets["APPROVAL_HEAD"]
+# headers = st.secrets["APPROVAL_HEAD"]
 
 @st.cache_data
 def convert_df(df):
@@ -45,24 +45,24 @@ def app():
             st.dataframe(df)
 
             new_df, approval_df = data_conversion(df,m_columns, n_columns, codes, subjobs, dept, admin_list, t_list)
-            approval_df = approval_df[headers]
-            approval_df['Current Date'] = datetime.now()
-            approval_df['Current Date'] = pd.to_datetime(approval_df['Current Date'], utc=True)
-            central_time_zone = pytz.timezone('US/Central')
-            approval_df['Current Date'] = approval_df['Current Date'].dt.tz_convert(central_time_zone)
+            # approval_df = approval_df[headers]
+            # approval_df['Current Date'] = datetime.now()
+            # approval_df['Current Date'] = pd.to_datetime(approval_df['Current Date'], utc=True)
+            # central_time_zone = pytz.timezone('US/Central')
+            # approval_df['Current Date'] = approval_df['Current Date'].dt.tz_convert(central_time_zone)
             
-            current_time_central = datetime.now(pytz.utc).astimezone(central_time_zone)
-            file_name = f"{current_time_central.strftime('%Y-%m-%d_%H-%M-%S')}_wait.csv"
-            csv_data = approval_df.to_csv(index=False)
+            # current_time_central = datetime.now(pytz.utc).astimezone(central_time_zone)
+            # file_name = f"{current_time_central.strftime('%Y-%m-%d_%H-%M-%S')}_wait.csv"
+            # csv_data = approval_df.to_csv(index=False)
 
-            st.subheader("Still Waiting for Approval")
-            st.dataframe(approval_df)
-            st.download_button(
-                label='Waiting for Approval',
-                data=csv_data,
-                file_name=file_name,
-                mime='text/csv'
-            )
+            # st.subheader("Still Waiting for Approval")
+            # st.dataframe(approval_df)
+            # st.download_button(
+            #     label='Waiting for Approval',
+            #     data=csv_data,
+            #     file_name=file_name,
+            #     mime='text/csv'
+            # )
 
             st.subheader("Converted Data")
             st.dataframe(new_df)

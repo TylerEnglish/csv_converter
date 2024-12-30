@@ -133,7 +133,12 @@ def data_conversion(main_df, main_columns, new_columns, codes, subjobs, dept, a_
         new_columns['Columns'][6]: np.where(
             m_df[m_df.columns[m_df.columns.get_loc(main_columns['Columns'][2])]].isin(a_list['Job']),
             'CON-CLOCK', 
-            m_df[m_df.columns[m_df.columns.get_loc(main_columns['Columns'][3])]]
+            np.where(
+                m_df[m_df.columns[m_df.columns.get_loc(main_columns['Columns'][3])]].notna(),
+                m_df[m_df.columns[m_df.columns.get_loc(main_columns['Columns'][3])]],  # Sub Job Code if available
+                m_df[m_df.columns[m_df.columns.get_loc(main_columns['Columns'][5])]]  # Fallback to main_columns['Columns'][5]
+            )
+        
         ),
         new_columns['Columns'][7]: None,
         new_columns['Columns'][8]: None,
